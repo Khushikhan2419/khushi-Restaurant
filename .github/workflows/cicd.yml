@@ -1,4 +1,3 @@
-
 name: CI/CD for Khushi Restaurant
 
 on:
@@ -36,7 +35,10 @@ jobs:
       - name: 📦 Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: 🛠 Build and Push Docker Image (Khushi)
+      # --------------------------------------------------------------------
+      # 🚀 FRONTEND BUILD & PUSH
+      # --------------------------------------------------------------------
+      - name: 🛠 Build and Push Docker Image (Frontend - Khushi)
         run: |
           set -e
           IMAGE_TAG="${GITHUB_SHA}"
@@ -44,7 +46,7 @@ jobs:
           REPO_NAME="shopping-site-${SERVICE_NAME}"
           IMAGE_URI="$ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG"
 
-          echo "🚀 Building ${SERVICE_NAME}..."
+          echo "🚀 Building ${SERVICE_NAME} frontend..."
           aws ecr describe-repositories --repository-names $REPO_NAME >/dev/null 2>&1 || \
             aws ecr create-repository --repository-name $REPO_NAME
 
@@ -53,19 +55,50 @@ jobs:
 
           sed -i "s|image:.*|image: $IMAGE_URI|g" "$FOLDER/deployment.yml"
 
-      - name: 🔄 Commit updated YAML file
+      # --------------------------------------------------------------------
+      # 🚀 BACKEND BUILD & PUSH
+      # --------------------------------------------------------------------
+      - name: 🛠 Build and Push Docker Image (Backend)
+        run: |
+          set -e
+          IMAGE_TAG="${GITHUB_SHA}"
+          FOLDER="backend"
+          REPO_NAME="shopping-site-${BACKEND_SERVICE}"
+          IMAGE_URI="$ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG"
+
+          echo "🚀 Building backend..."
+          aws ecr describe-repositories --repository-names $REPO_NAME >/dev/null 2>&1 || \
+            aws ecr create-repository --repository-name $REPO_NAME
+
+          docker build -t $IMAGE_URI $FOLDER
+          docker push $IMAGE_URI
+
+          sed -i "s|image:.*|image: $IMAGE_URI|g" "$FOLDER/deployment.yml"
+
+      # --------------------------------------------------------------------
+      # 🔄 COMMIT FRONTEND + BACKEND YAML UPDATES
+      # --------------------------------------------------------------------
+      - name: 🔄 Commit updated YAML files
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
 
           git add frontend/${SERVICE_NAME}/deployment.yml
-          git commit -m "🔄 Update image tag for ${SERVICE_NAME} [skip ci]" || echo "⚠️ No YAML changes"
+          git add backend/deployment.yml
+
+          git commit -m "🔄 Update image tags for frontend & backend [skip ci]" || echo "⚠️ No YAML changes"
           git push origin main || echo "⚠️ No changes to push"
 
+      # --------------------------------------------------------------------
+      # 🧠 Skip CI loop
+      # --------------------------------------------------------------------
       - name: 🧠 Skip loop if commit was automated
         if: contains(github.event.head_commit.message, '[skip ci]')
         run: echo "Skipping re-triggered build due to [skip ci] commit"
 
+      # --------------------------------------------------------------------
+      # 🚀 DEPLOY TO EC2
+      # --------------------------------------------------------------------
       - name: 🚀 Deploy on EC2
         if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
         uses: appleboy/ssh-action@v1.2.0
@@ -88,7 +121,7 @@ jobs:
               cd khushi-Restaurant
             fi
 
-            echo "🐳 Updating and restarting container for ${SERVICE_NAME}..."
+            echo "🐳 Restarting Docker Compose..."
             docker compose down || true
             docker compose up -d --build
 
