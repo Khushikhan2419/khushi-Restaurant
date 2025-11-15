@@ -1,0 +1,862 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Khushi - Chill Vibe Cafe</title>
+  <meta name="title" content="Khushi - Chill Vibe Cafe Sign up / Login">
+  <meta name="description" content="Signup and login to Khushi Cafe to enjoy special offers and a delightful food experience.">
+
+  <link rel="shortcut icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&family=Forum&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/style.css">
+  <link rel="preload" as="image" href="./assets/images/hero-slider-1.jpg">
+  <link rel="preload" as="image" href="./assets/images/hero-slider-2.jpg">
+  <link rel="preload" as="image" href="./assets/images/hero-slider-3.jpg">
+
+  <style>
+    /* ... existing styles remain ... */
+    /* AUTH MODAL REWORK: ANIMATION & DYNAMIC SIGNUP/LOGIN TABS */
+    #auth-modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 10009;
+      background: rgba(33,24,12,0.38);
+      justify-content: center;
+      align-items: center;
+      overflow: auto;
+      transition: background 0.25s;
+      animation: fadeInBG .28s;
+    }
+    @keyframes fadeInBG {
+      from { opacity:0 } to { opacity:1 }
+    }
+    #auth-modal-bg.active {
+      display: flex !important;
+    }
+    #auth-modal {
+      width: 385px;
+      background: #fff7e7;
+      border-radius: 18px;
+      padding: 2.2rem 2.2rem 1.7rem 2.2rem;
+      box-shadow: 0 8px 40px #c6944335, 0 2px 1px #fff8ebcc, 0 1px 6px #9048221a;
+      position: relative;
+      transition: transform 0.31s cubic-bezier(.6,.12,.43,1.31), opacity 0.31s;
+      opacity: 1;
+      transform: translateY(0);
+      will-change: transform, opacity;
+      animation: modalPopIn .47s cubic-bezier(.57,2.1,.58,.96);
+    }
+    @keyframes modalPopIn {
+      from { opacity:.1; transform: scale(.85) translateY(60px);}
+      to { opacity:1; transform: scale(1) translateY(0);}
+    }
+    #auth-modal.slide-form-in {
+      animation: modalTabSwitchIn 0.32s;
+    }
+    @keyframes modalTabSwitchIn {
+      from { opacity:0; transform: translateY(20px) scale(1.03);}
+      to   { opacity:1; transform: translateY(0) scale(1);}
+    }
+    #auth-modal.slide-form-out {
+      opacity:0;
+      transform: translateY(40px) scale(0.95); transition:.21s;
+    }
+    .close-btn-modal {
+      position: absolute;
+      right: 15px; top: 14px;
+      background: transparent;
+      border: none; font-size: 1.7em;
+      color: #ac8746; font-weight: 700;
+      cursor: pointer;
+      z-index: 20;
+      transition: color 0.2s;
+    }
+    .close-btn-modal:hover { color: #be2323; }
+    .modal-tabs {
+      display: flex; gap: 0.5em;
+      justify-content: center; margin-bottom: 1.3em;
+      margin-top: -6px;
+    }
+    .modal-tab {
+      padding: 0.75em 2.0em 0.67em 2.0em;
+      background: #eee8db;
+      color: #8a3c12;
+      font-weight: 600;
+      font-size: 1.08em;
+      border-radius: 7px 7px 0 0;
+      border: none;
+      cursor: pointer;
+      transition: background .19s, color .19s;
+      outline: none;
+      margin-bottom: -1px;
+      border-bottom: 2.5px solid transparent;
+    }
+    .modal-tab.active, .modal-tab:focus {
+      background: #fff7e7;
+      color: #c69443;
+      border-bottom: 2.5px solid #c69443;
+    }
+    #auth-modal h2#title {
+      text-align: center;
+      color: #c69443;
+      letter-spacing: 1.1px;
+      font-family: 'Forum', serif;
+      margin-bottom: .4em;
+      font-size: 1.5em;
+    }
+    #msg {
+      display:block;
+      min-height:26px;
+      text-align: center;
+      margin-bottom: .8em;
+      font-weight: 500;
+      color: #a64f44;
+      font-size: 1em;
+      transition: color .15s;
+    }
+    #msg.success { color: #357d2c; }
+    .form-group {
+      margin-bottom: 1.18em;
+      display: flex;
+      flex-direction: column;
+    }
+    .form-group label {
+      margin-bottom: .41em;
+      color: #873800;
+      font-weight: 600;
+    }
+    input[type="email"], input[type="text"], input[type="password"] {
+      border-radius: 7px;
+      border: 1px solid #d8c8ab;
+      background: #fffefa;
+      padding: 10px 13px;
+      font-size: 1em;
+      margin-bottom:0px;
+    }
+    .password-toggle { position:relative; }
+    .toggle-password-btn {
+      position:absolute;
+      right:10px; top:31px;
+      background:transparent;border:none;cursor:pointer;
+      color:#c69443;font-size:1.27em;line-height:1;
+      padding:1px 3px;
+      z-index:2;
+      display:flex;align-items:center;
+      transition: color .12s;
+    }
+    .toggle-password-btn:hover { color: #994c0a;}
+    .forgot-link {
+      color: #a7742d;
+      font-size: 0.97em;
+      cursor: pointer;
+      text-decoration: underline dashed #c69443;
+      margin-bottom:10px;
+      margin-top:-.7em;
+      text-align: right;
+      display:block;
+    }
+    .form-terms {
+      flex-direction: row;
+      align-items: center;
+      margin-top: -10px;
+      gap: 7px;
+    }
+    .form-terms input[type="checkbox"] {
+      accent-color: #c69443; margin-bottom:0;
+    }
+    /* CUSTOM: Set all .auth-btn-nav and auth-modal button[type="submit"] background to "bround" */
+    .auth-btn-nav,
+    #auth-modal button[type="submit"] {
+      background: #a86b3f !important; /* "bround" = brown + round, using a pleasant readable brown */
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: .83em 1.2em;
+      font-size: 1.08em;
+      font-weight: 700;
+      margin-top: .31em;
+      box-shadow: 0 2px 12px #e2bb8f38;
+      cursor: pointer;
+      transition: background 0.19s;
+    }
+    .auth-btn-nav:hover,
+    #auth-modal button[type="submit"]:hover {
+      background: #7a4622 !important;
+      color: #fffbe3;
+    }
+    .switchlink {
+      margin: 0.9em 0 0.2em 0;
+      font-size:.97em;
+      color: #936134;
+      text-align:center;
+    }
+    .switchlink a {
+      color: #b34e09;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: underline;
+      margin-left:3px;
+      transition: color .16s;
+    }
+    .switchlink a:hover { color: #a73803;}
+    .auth-social {
+      margin: 0.8em 0 0.3em 0;
+      text-align: center;
+    }
+    .auth-social-label {
+      font-size: 0.99em;
+      color: #9d8655;
+      display: block;
+      margin-bottom: 0.6em;
+    }
+    .social-login-btns {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 1.1em;
+    }
+    .social-btn {
+      background: #f3e8d3;
+      border-radius: 50%;
+      border: none;
+      width: 38px; height: 38px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.28em;
+      color: #a97a27;
+      cursor: pointer;
+      box-shadow: 0 0 7px #eed9a77c inset;
+      transition: background .18s, color .13s,box-shadow .18s;
+    }
+    .social-btn:active,.social-btn:hover {
+      background: #ffe4b0;
+      color: #a63c18;
+      box-shadow: 0 1px 9px #deb46b40 inset;
+    }
+    .field-error {
+      color: #b31420;
+      font-size: 0.935em;
+      margin-top: 6px;
+      margin-bottom: 0.1em;
+      font-weight: 500;
+      display: none;
+    }
+    .success-msg {
+      color: #26791b;
+      text-align: center;
+      margin-top: 1em;
+      font-weight: 600;
+      font-size: 1em;
+    }
+    .info-msg {
+      color: #c69443;
+      text-align: center;
+      margin-top: .7em;
+      font-weight: 500;
+      font-size: .95em;
+    }
+
+    /* Hide old static signup section */
+    #signup-section, #custom-signup-form { display: none !important; }
+  </style>
+</head>
+
+<body id="top">
+
+  <!-- #PRELOADER -->
+  <div class="preload" data-preaload>
+    <div class="circle"></div>
+    <p class="text">Khushi</p>
+  </div>
+
+  <!-- #TOP BAR -->
+  <div class="topbar">
+    <div class="container">
+      <address class="topbar-item">
+        <div class="icon">
+          <ion-icon name="location-outline" aria-hidden="true"></ion-icon>
+        </div>
+        <span class="span"> Restaurant St, Delicious City, London 9578, UK </span>
+      </address>
+      <div class="separator"></div>
+      <div class="topbar-item item-2">
+        <div class="icon">
+          <ion-icon name="time-outline" aria-hidden="true"></ion-icon>
+        </div>
+        <span class="span">Daily : 8.00 am to 10.00 pm</span>
+      </div>
+      <a href="tel:+11234567890" class="topbar-item link">
+        <div class="icon">
+          <ion-icon name="call-outline" aria-hidden="true"></ion-icon>
+        </div>
+        <span class="span">+1 123 456 7890</span>
+      </a>
+      <div class="separator"></div>
+      <a href="mailto:booking@restaurant.com" class="topbar-item link">
+        <div class="icon">
+          <ion-icon name="mail-outline" aria-hidden="true"></ion-icon>
+        </div>
+        <span class="span">booking@restaurant.com</span>
+      </a>
+      <span style="margin-left:auto"></span>
+      <button class="auth-btn-nav" onclick="openAuthModal('login')">Login</button>
+      <button class="auth-btn-nav" onclick="openAuthModal('signup')">Signup</button>
+    </div>
+  </div>
+
+  <!-- #HEADER -->
+  <header class="header" data-header>
+    <div class="container">
+      <a href="#" class="logo">
+        <img src="https://i.ibb.co/jPgjT3rh/khushiii.png" width="160" height="50" alt="Khushi - Home">
+      </a>
+      <nav class="navbar" data-navbar>
+        <button class="close-btn" aria-label="close menu" data-nav-toggler>
+          <ion-icon name="close-outline" aria-hidden="true"></ion-icon>
+        </button>
+        <a href="#" class="logo">
+          <img src="./assets/images/logo.svg" width="160" height="50" alt="Khushi - Home">
+        </a>
+        
+        <div class="text-center">
+          <p class="headline-1 navbar-title">Visit Us</p>
+          <address class="body-4">
+            Restaurant St, Delicious City, <br>
+            London 9578, UK
+          </address>
+          <p class="body-4 navbar-text">Open: 9.30 am - 2.30pm</p>
+          <a href="mailto:booking@khushi.com" class="body-4 sidebar-link">booking@khushi.com</a>
+          <div class="separator"></div>
+          <p class="contact-label">Booking Request</p>
+          <a href="tel:+88123123456" class="body-1 contact-number hover-underline">
+            +88-123-123456
+          </a>
+        </div>
+      </nav>
+      <button class="nav-open-btn" aria-label="open menu" data-nav-toggler>
+        <span class="line line-1"></span>
+        <span class="line line-2"></span>
+        <span class="line line-3"></span>
+      </button>
+      <div class="overlay" data-nav-toggler data-overlay></div>
+    </div>
+  </header>
+
+  <!-- DYNAMIC AUTH MODAL WITH TABS + ANIMATION -->
+  <div id="auth-modal-bg">
+    <div id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="title">
+      <button class="close-btn-modal" onclick="closeAuthModal()" aria-label="Close">&times;</button>
+      <div class="modal-tabs">
+        <button class="modal-tab" id="tabLogin" onclick="switchAuthTab('login')" type="button" aria-selected="false">Login</button>
+        <button class="modal-tab" id="tabSignup" onclick="switchAuthTab('signup')" type="button" aria-selected="false">Signup</button>
+      </div>
+      <h2 id="title">Login</h2>
+      <span id="msg"></span>
+      <!-- LOGIN FORM -->
+      <form id="loginForm" onsubmit="event.preventDefault(); login();" autocomplete="on" style="display:block;">
+        <div class="form-group">
+          <label for="li_email">Email</label>
+          <input type="email" id="li_email" placeholder="Email" required autocomplete="username" />
+        </div>
+        <div class="form-group password-toggle">
+          <label for="li_password" style="width:100%;">Password</label>
+          <input type="password" id="li_password" placeholder="Password" required autocomplete="current-password" minlength="6" />
+          <button class="toggle-password-btn" tabindex="-1" type="button" onclick="toggleShowPwd('li_password', this)">
+            <ion-icon name="eye-outline"></ion-icon>
+          </button>
+        </div>
+        <a class="forgot-link" onclick="showForgot()" tabindex="0">Forgot password?</a>
+        <div class="form-group form-terms" style="justify-content: flex-start;">
+          <input type="checkbox" id="li_remember" style="margin-bottom:0;">
+          <label for="li_remember" style="margin-bottom:0;font-weight:400;">Remember me</label>
+        </div>
+        <button type="submit">Login</button>
+      </form>
+      <!-- FORGOT PASSWORD -->
+      <form id="forgotForm" style="display:none;" onsubmit="event.preventDefault(); forgotPassword();">
+        <div class="form-group">
+          <label for="fp_email">Your account Email<span style="color:red">*</span></label>
+          <input type="email" id="fp_email" placeholder="Email address" required />
+        </div>
+        <button type="submit">Send Reset Link</button>
+        <div class="switchlink" style="margin-top: 8px;">
+          <a onclick="showLogin()">Back to Login</a>
+        </div>
+      </form>
+      <!-- SIGNUP FORM DYNAMIC -->
+      <form id="signupForm" style="display:none;" autocomplete="on">
+        <div class="form-group">
+          <label for="new_username">Username<span style="color:red">*</span></label>
+          <input type="text" id="new_username" name="username" placeholder="Choose a username" required minlength="3" maxlength="20" pattern="[A-Za-z0-9_]{3,20}" autocomplete="username" />
+          <div class="field-error" id="signup-username-error"></div>
+        </div>
+        <div class="form-group">
+          <label for="new_email">Email<span style="color:red">*</span></label>
+          <input type="email" id="new_email" name="email" placeholder="Enter your email" required autocomplete="email" />
+          <div class="field-error" id="signup-email-error"></div>
+        </div>
+        <div class="form-group password-toggle">
+          <label for="new_password">Password <span style="color:red">*</span></label>
+          <input type="password" id="new_password" name="password" placeholder="Password" required minlength="8" autocomplete="new-password" />
+          <button class="toggle-password-btn" tabindex="-1" type="button" onclick="toggleShowPwd('new_password', this)">
+            <ion-icon name="eye-outline"></ion-icon>
+          </button>
+          <div class="field-error" id="signup-password-error"></div>
+        </div>
+        <div class="form-group password-toggle">
+          <label for="new_confirmpassword">Confirm Password <span style="color:red">*</span></label>
+          <input type="password" id="new_confirmpassword" name="new_confirmpassword" placeholder="Confirm Password" required minlength="8" autocomplete="new-password" />
+          <button class="toggle-password-btn" tabindex="-1" type="button" onclick="toggleShowPwd('new_confirmpassword', this)">
+            <ion-icon name="eye-outline"></ion-icon>
+          </button>
+          <div class="field-error" id="signup-confirm-password-error"></div>
+        </div>
+        <div class="form-group form-terms">
+          <input type="checkbox" id="new_terms" required>
+          <label for="new_terms">
+            I agree to the <a href="#" target="_blank">Terms &amp; Conditions</a>. <span style="color:red">*</span>
+          </label>
+        </div>
+        <button type="submit">Sign Up</button>
+        <div class="success-msg" id="signup-success-msg" style="display:none;"></div>
+        <div class="info-msg" id="signup-info-msg" style="display:none;"></div>
+      </form>
+      <!-- Switch links -->
+      <div class="switchlink" id="switchlink-login" style="display:block;">
+        Don't have an account?
+        <a onclick="switchAuthTab('signup')">Sign up here</a>
+      </div>
+      <div class="switchlink" id="switchlink-signup" style="display:none;">
+        Already have an account?
+        <a onclick="switchAuthTab('login')">Log in</a>
+      </div>
+      <!-- Social login -->
+      <div class="auth-social">
+        <span class="auth-social-label">or sign in with</span>
+        <div class="social-login-btns">
+          <button class="social-btn" type="button" title="Login with Google" onclick="socialLogin('google')">
+            <ion-icon name="logo-google"></ion-icon>
+          </button>
+          <button class="social-btn" type="button" title="Login with Facebook" onclick="socialLogin('facebook')">
+            <ion-icon name="logo-facebook"></ion-icon>
+          </button>
+          <button class="social-btn" type="button" title="Login with Apple" onclick="socialLogin('apple')">
+            <ion-icon name="logo-apple"></ion-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- / DYNAMIC AUTH MODAL -->
+
+  <main>
+    <article>
+      <!-- Main content unchanged (menus, hero) -->
+      <section class="hero text-center" aria-label="home" id="home">
+        <ul class="hero-slider" data-hero-slider>
+          <li class="slider-item active" data-hero-slider-item>
+            <div class="slider-bg">
+              <img src="./assets/images/hero-slider-1.jpg" width="1880" height="950" alt="" class="img-cover">
+            </div>
+            <p class="label-2 section-subtitle slider-reveal">Tradational & Hygine</p>
+            <h1 class="display-1 hero-title slider-reveal">
+              For the love of <br>
+              delicious food
+            </h1>
+            <p class="body-2 hero-text slider-reveal">
+              Come with family & feel the joy of mouthwatering food
+            </p>
+            <a href="#" class="btn btn-primary slider-reveal">
+              <span class="text text-1">View Our Menu</span>
+              <span class="text text-2" aria-hidden="true">View Our Menu</span>
+            </a>
+          </li>
+          <li class="slider-item" data-hero-slider-item>
+            <div class="slider-bg">
+              <img src="./assets/images/hero-slider-2.jpg" width="1880" height="950" alt="" class="img-cover">
+            </div>
+            <p class="label-2 section-subtitle slider-reveal">delightful experience</p>
+            <h1 class="display-1 hero-title slider-reveal">
+              Flavors Inspired by <br>
+              the Seasons
+            </h1>
+            <p class="body-2 hero-text slider-reveal">
+              Come with family & feel the joy of mouthwatering food
+            </p>
+            <a href="#" class="btn btn-primary slider-reveal">
+              <span class="text text-1">View Our Menu</span>
+              <span class="text text-2" aria-hidden="true">View Our Menu</span>
+            </a>
+          </li>
+          <li class="slider-item" data-hero-slider-item>
+            <div class="slider-bg">
+              <img src="./assets/images/hero-slider-3.jpg" width="1880" height="950" alt="" class="img-cover">
+            </div>
+            <p class="label-2 section-subtitle slider-reveal">amazing & delicious</p>
+            <h1 class="display-1 hero-title slider-reveal">
+              Where every flavor <br>
+              tells a story
+            </h1>
+            <p class="body-2 hero-text slider-reveal">
+              Come with family & feel the joy of mouthwatering food
+            </p>
+            <a href="#" class="btn btn-primary slider-reveal">
+              <span class="text text-1">View Our Menu</span>
+              <span class="text text-2" aria-hidden="true">View Our Menu</span>
+            </a>
+          </li>
+        </ul>
+        <button class="slider-btn prev" aria-label="slide to previous" data-prev-btn>
+          <ion-icon name="chevron-back"></ion-icon>
+        </button>
+        <button class="slider-btn next" aria-label="slide to next" data-next-btn>
+          <ion-icon name="chevron-forward"></ion-icon>
+        </button>
+        <a href="#" class="hero-btn has-after">
+          <img src="./assets/images/hero-icon.png" width="48" height="48" alt="booking icon">
+          <span class="label-2 text-center span">Book A Table</span>
+        </a>
+      </section>
+      <!-- (Signup section hidden by CSS since now included in modal) -->
+    </article>
+  </main>
+
+  <!-- #BACK TO TOP -->
+  <a href="#top" class="back-top-btn active" aria-label="back to top" data-back-top-btn>
+    <ion-icon name="chevron-up" aria-hidden="true"></ion-icon>
+  </a>
+
+  <script src="./assets/js/script.js"></script>
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+  <script>
+    const API_URL = "http://a1774c733b9054f75b4ce7aa03a02f39-1151841240.ap-southeast-2.elb.amazonaws.com/api";
+
+    // === ANIMATED AUTH DIALOG + TABS CODE ===
+    let currentTab = 'login'; // track active tab
+
+    function switchAuthTab(tab) {
+      if (!['login','signup'].includes(tab)) return;
+
+      const modal = document.getElementById('auth-modal');
+      // Animation: fade+slide out old
+      modal.classList.remove('slide-form-in');
+      modal.classList.add('slide-form-out');
+      setTimeout(() => {
+        // Hide all forms
+        document.getElementById("loginForm").style.display = "none";
+        document.getElementById("signupForm").style.display = "none";
+        document.getElementById("forgotForm").style.display = "none";
+        document.getElementById("msg").innerText = "";
+
+        // Show active tab
+        if(tab === 'login'){
+          document.getElementById("title").innerText = "Login";
+          document.getElementById("loginForm").style.display = "block";
+          document.getElementById("switchlink-login").style.display = "block";
+          document.getElementById("switchlink-signup").style.display = "none";
+        }
+        if(tab === 'signup') {
+          document.getElementById("title").innerText = "Sign Up";
+          document.getElementById("signupForm").style.display = "block";
+          document.getElementById("switchlink-signup").style.display = "block";
+          document.getElementById("switchlink-login").style.display = "none";
+        }
+        // Highlight correct tab
+        ["tabLogin", "tabSignup"].forEach(tid => {
+          let t = document.getElementById(tid);
+          if(t) t.classList.remove("active");
+        });
+        document.getElementById(tab === 'signup' ? "tabSignup" : "tabLogin").classList.add("active");
+        // ARIA
+        document.getElementById("tabLogin").setAttribute("aria-selected", tab === "login");
+        document.getElementById("tabSignup").setAttribute("aria-selected", tab === "signup");
+        // Animate pop in
+        modal.classList.remove('slide-form-out');
+        modal.classList.add('slide-form-in');
+        currentTab = tab;
+      }, 175); // close + open in one
+    }
+
+    function showLogin() {
+      switchAuthTab('login');
+    }
+    function showForgot() {
+      // Animate out login, then in forgot form
+      const modal = document.getElementById('auth-modal');
+      modal.classList.remove('slide-form-in');
+      modal.classList.add('slide-form-out');
+      setTimeout(() => {
+        document.getElementById("loginForm").style.display = "none";
+        document.getElementById("forgotForm").style.display = "block";
+        document.getElementById("signupForm").style.display = "none";
+        document.getElementById("title").innerText = "Forgot Password";
+        document.getElementById("msg").innerText = "";
+        document.getElementById("switchlink-login").style.display = "none";
+        document.getElementById("switchlink-signup").style.display = "none";
+        // Remove tab highlights
+        ["tabLogin", "tabSignup"].forEach(tid => {
+          let t = document.getElementById(tid);
+          if(t) t.classList.remove("active");
+        });
+        modal.classList.remove('slide-form-out');
+        modal.classList.add('slide-form-in');
+      }, 175);
+    }
+
+    function openAuthModal(mode) {
+      document.getElementById("auth-modal-bg").classList.add("active");
+      document.body.style.overflow = "hidden";
+      if (mode === "signup") switchAuthTab('signup');
+      else switchAuthTab('login');
+
+      // Reset forms
+      document.getElementById("li_email").value = "";
+      document.getElementById("li_password").value = "";
+      document.getElementById("li_remember").checked = false;
+      document.getElementById("fp_email").value = "";
+    }
+    function closeAuthModal() {
+      document.getElementById("auth-modal-bg").classList.remove("active");
+      setTimeout(()=>{document.body.style.overflow = "";},205);
+      document.getElementById("msg").innerText = "";
+    }
+
+    function toggleShowPwd(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      const isPwd = input.type === "password";
+      input.type = isPwd ? "text" : "password";
+      btn.innerHTML = `<ion-icon name="eye${isPwd ? '-off' : ''}-outline"></ion-icon>`;
+    }
+
+    function validateEmail(email) {
+      return /^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,}$/.test(email);
+    }
+
+    // Password strength (at least 8, upper, lower, digit, special)
+    function validateStrongPassword(pw) {
+      return {
+        len: pw.length >= 8,
+        upper: /[A-Z]/.test(pw),
+        lower: /[a-z]/.test(pw),
+        num: /\d/.test(pw),
+        special: /[!@#$%^&*(),.?":{}|<>]/.test(pw)
+      }
+    }
+
+    // === SIGNUP FORM LOGIC + VALIDATION ===
+    function clearSignupErrors() {
+      ['signup-username-error','signup-email-error','signup-password-error','signup-confirm-password-error'].forEach(function(id){
+        let el = document.getElementById(id);
+        if (el) { el.innerText = ""; el.style.display = "none";}
+      });
+      document.getElementById("signup-success-msg").style.display = "none";
+      document.getElementById("signup-info-msg").style.display = "none";
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+      // Signup form handler
+      const sform = document.getElementById('signupForm');
+      if (sform) {
+        sform.addEventListener('submit', function(e){
+          e.preventDefault();
+          clearSignupErrors();
+          const username = document.getElementById('new_username').value.trim();
+          const email = document.getElementById('new_email').value.trim();
+          const password = document.getElementById('new_password').value;
+          const confirmpw = document.getElementById('new_confirmpassword').value;
+          const terms = document.getElementById('new_terms').checked;
+
+          let hasError = false;
+          if(!username.match(/^[A-Za-z0-9_]{3,20}$/)){
+            let err = document.getElementById('signup-username-error');
+            err.innerText = "Username must be 3-20 characters: letters, numbers or _";
+            err.style.display = "block";
+            hasError = true;
+          }
+          if(!validateEmail(email)) {
+            let err = document.getElementById('signup-email-error');
+            err.innerText = "Please provide a valid email address.";
+            err.style.display = "block";
+            hasError = true;
+          }
+          const req = validateStrongPassword(password);
+          if(!(req.len && req.upper && req.lower && req.num && req.special)) {
+            let err = document.getElementById('signup-password-error');
+            err.innerText = "Password must be at least 8 characters, with uppercase, lowercase, a number, and a special character.";
+            err.style.display = "block";
+            hasError = true;
+          }
+          if(password !== confirmpw){
+            let err = document.getElementById('signup-confirm-password-error');
+            err.innerText = "Passwords do not match.";
+            err.style.display = "block";
+            hasError = true;
+          }
+          if(!terms){
+            document.getElementById("signup-info-msg").innerText = "Please accept the Terms & Conditions to sign up!";
+            document.getElementById("signup-info-msg").style.display = "block";
+            hasError = true;
+          }
+          if(hasError) return;
+
+          // Animate loading on submit (button disables)
+          sform.querySelector('button[type="submit"]').disabled = true;
+          sform.querySelector('button[type="submit"]').innerHTML = 'Creating... <span style="scale:0.84;display:inline-block;"><ion-icon name="refresh-outline" class="spin"></ion-icon></span>';
+
+          fetch(`${API_URL}/signup`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ username, email, password })
+          }).then(async (res) => {
+            const data = await res.json();
+            if(res.status === 201){
+              document.getElementById("signup-success-msg").innerText = "Signup successful! You can now log in.";
+              document.getElementById("signup-success-msg").style.display = "block";
+              sform.querySelector('button[type="submit"]').disabled = false;
+              sform.querySelector('button[type="submit"]').innerText = "Sign Up";
+              setTimeout(() => {
+                switchAuthTab('login');
+              }, 1500);
+            }else{
+              let msg = data.error || data.message || "Signup failed. Please try again.";
+              document.getElementById("signup-info-msg").innerText = msg;
+              document.getElementById("signup-info-msg").style.display = "block";
+              sform.querySelector('button[type="submit"]').disabled = false;
+              sform.querySelector('button[type="submit"]').innerText = "Sign Up";
+            }
+          }).catch(() => {
+            document.getElementById("signup-info-msg").innerText = "Failed to connect. Try again later.";
+            document.getElementById("signup-info-msg").style.display = "block";
+            sform.querySelector('button[type="submit"]').disabled = false;
+            sform.querySelector('button[type="submit"]').innerText = "Sign Up";
+          });
+        });
+        // Live validation for confirm password field
+        document.getElementById('new_confirmpassword').addEventListener('input', function(){
+          let confirmpw = this.value;
+          let pw = document.getElementById('new_password').value;
+          let err = document.getElementById('signup-confirm-password-error');
+          if(confirmpw && confirmpw !== pw){
+            err.innerText = "Passwords do not match.";
+            err.style.display = "block";
+          } else {
+            err.innerText = "";
+            err.style.display = "none";
+          }
+        });
+      }
+    });
+
+    // LOGIN, FORGOT, SOCIAL -- UNCHANGED
+    async function login() {
+      const email = document.getElementById("li_email").value.trim();
+      const password = document.getElementById("li_password").value;
+      const remember = document.getElementById("li_remember").checked;
+      const msg = document.getElementById("msg");
+      msg.innerText = '';
+      msg.classList.remove("success");
+
+      if (!validateEmail(email)) {
+        msg.innerText = "Please enter a valid email address.";
+        return;
+      }
+      if (password.length < 6) {
+        msg.innerText = "Password must be at least 6 characters.";
+        return;
+      }
+      // Animate button state (disable, spinner)
+      const submitBtn = document.querySelector("#loginForm button[type=submit]");
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = 'Logging in... <span style="scale:0.84;display:inline-block;"><ion-icon name="refresh-outline" class="spin"></ion-icon></span>';
+      try {
+        const res = await fetch(`${API_URL}/login`, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (res.status === 200) {
+          msg.innerText = "Login Successful!";
+          msg.classList.add("success");
+          localStorage.setItem("user", JSON.stringify(data.user));
+          if (remember) {
+            localStorage.setItem("rememberEmail", email);
+          } else {
+            localStorage.removeItem("rememberEmail");
+          }
+          submitBtn.disabled = false;
+          submitBtn.innerText = "Login";
+          setTimeout(() => {
+            closeAuthModal();
+            window.location.href = "main.html";
+          }, 750);
+        } else {
+          msg.innerText = data.error || data.message || "Login failed";
+          msg.classList.remove("success");
+          submitBtn.disabled = false;
+          submitBtn.innerText = "Login";
+        }
+      } catch (e) {
+        msg.innerText = "Failed to connect. Try again later.";
+        msg.classList.remove("success");
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Login";
+      }
+    }
+    async function forgotPassword() {
+      const email = document.getElementById("fp_email").value.trim();
+      const msg = document.getElementById("msg");
+      msg.innerText = "";
+      msg.classList.remove("success");
+      if (!validateEmail(email)) {
+        msg.innerText = "Please enter your registered email.";
+        return;
+      }
+      msg.innerHTML = "Sending reset link... <span style='scale:0.8;display:inline-block;'><ion-icon name='refresh-outline' class='spin'></ion-icon></span>";
+      setTimeout(()=>{
+        msg.innerText = "If an account exists, a reset link has been sent!";
+        msg.classList.add("success");
+        setTimeout(() => {
+          showLogin();
+        }, 1700);
+      }, 850);
+    }
+    function socialLogin(provider) {
+      document.getElementById("msg").innerText = "Social login (" + provider.charAt(0).toUpperCase() + provider.slice(1) + ") not implemented.";
+      setTimeout(()=>{ document.getElementById("msg").innerText = ""; }, 1800);
+    }
+    // Modal close with Escape or bg click
+    window.addEventListener("keydown", function(e){
+      if (e.key === "Escape") closeAuthModal();
+    });
+    document.getElementById("auth-modal-bg").addEventListener("click", function(e){
+      if (e.target === this) closeAuthModal();
+    });
+    // Remembered email from localStorage, fill at DOMContentLoaded
+    if (localStorage.getItem("rememberEmail")) {
+      document.addEventListener('DOMContentLoaded', ()=>{
+        document.getElementById("li_email").value = localStorage.getItem("rememberEmail");
+        document.getElementById("li_remember").checked = true;
+      });
+    }
+    // On DOM ready, show login tab
+    document.addEventListener('DOMContentLoaded', function(){
+      showLogin();
+    });
+
+    // Animate icons (CSS spin for spinners)
+    const style = document.createElement('style');
+    style.innerHTML = `.spin {animation:spinit 0.9s linear infinite;}
+    @keyframes spinit{ 0%{transform:rotate(0deg);}100%{transform:rotate(359deg);} }`;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>
