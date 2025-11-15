@@ -11,6 +11,8 @@ env:
   ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-southeast-2.amazonaws.com
   SERVICE_NAME: "khushi"
 
+  BACKEND_SERVICE: "backend"
+
 permissions:
   contents: write
 
