@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
       - name: khushi
-        image: 049061799945.dkr.ecr.ap-southeast-2.amazonaws.com/shopping-site-khushi:2dc52d59abf47439da5e9f27fceaac051c21e4c6
+        image: 049061799945.dkr.ecr.ap-southeast-2.amazonaws.com/shopping-site-khushi:6d38b37505c228b28725857c3b686a0e5f0f89fb
         ports:
         - containerPort: 80
